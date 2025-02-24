@@ -35,5 +35,36 @@ namespace PokemonAPI.Repositories
         {
             return _dataContext.Pokemons.OrderBy(o => o.Id).ToList();
         }
+
+        public bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon)
+        {
+            var pokemonOwnerEntity = _dataContext.Owners.Where(a => a.Id == ownerId).FirstOrDefault();
+            var category = _dataContext.Categories.Where(a => a.Id == categoryId).FirstOrDefault();
+
+            var pokemonOwner = new PokemonOwner()
+            {
+                Owner = pokemonOwnerEntity,
+                Pokemon = pokemon
+            };
+
+            _dataContext.Add(pokemonOwner);
+
+            var pokemonCategory = new PokemonCategory()
+            {
+                Category = category,
+                Pokemon = pokemon
+            };
+
+            _dataContext.Add(pokemonCategory);
+
+            _dataContext.Add(pokemon);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var save = _dataContext.SaveChanges();
+            return save > 0;
+        }
     }
 }
